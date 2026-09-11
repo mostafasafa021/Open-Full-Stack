@@ -19,8 +19,8 @@ const Country = ({ country }) => {
           </div>
           <h2>Langauges</h2>
           <ul>
-            {langsArray.map((lang) => (
-              <li>{lang}</li>
+            {Object.entries(languages).map(([langCode, language]) => (
+              <li key={langCode}>{language}</li>
             ))}
           </ul>
           <img src={flags.png} alt={`flag of ${name.common}`} />
