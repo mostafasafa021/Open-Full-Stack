@@ -14,7 +14,7 @@ const App = () => {
   useEffect(() => {
     services.getAll().then((data) => {
       setNotes(data);
-      console.log(data);
+      console.log(data)
     });
   }, []);
 
