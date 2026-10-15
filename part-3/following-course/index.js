@@ -29,10 +29,6 @@ app.use(
 );
 app.use(express.static("dist"));
 
-app.get("/", (request, response) => {
-  response.send(`<h1>Hello world 123</h1>`);
-});
-
 app.get("/api/notes", (request, response) => {
   response.json(notes);
 });
