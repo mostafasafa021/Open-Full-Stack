@@ -1,6 +1,6 @@
 const Notification = ({ message, error }) => {
   return (
-    (message || error) && <div className={error ? 'error' : 'message'}>{message}</div>
+    (message || error) && <div className={error ? 'error' : 'message'}>{message || error}</div>
   );
 };
 
