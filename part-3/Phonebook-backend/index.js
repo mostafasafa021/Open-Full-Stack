@@ -64,8 +64,8 @@ app.delete("/api/persons/:id", (req, res) => {
 });
 
 app.post("/api/persons/", (req, res) => {
-  const name = req.body.name;
-  const number = req.body.number;
+  const name = req.body?.name;
+  const number = req.body?.number;
   if (!name) return res.status(400).json({ message: "You Must Enter Name" });
 
   if (!number)
