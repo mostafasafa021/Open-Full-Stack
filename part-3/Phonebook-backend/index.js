@@ -57,6 +57,7 @@ app.delete("/api/persons/:id", (req, res) => {
   if (contact) {
     phoneContacts = phoneContacts.filter((contact) => contact.id !== id);
     res.status(204).end();
+    return;
   }
 
   res.status(404).json({ message: "Contact Not Found" });
