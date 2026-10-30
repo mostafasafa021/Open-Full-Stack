@@ -10,11 +10,13 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "build:ui": "rm -rf dist && cd ../../part-2/following-course/vite-project && npm run build && cp -r dist ../../../part-3/following-course",
+    "build:ui": "rm -rf dist && cd ../../part-2/following-course/vite-project && npm run build && mv dist ../../../part-3/following-course",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
   },
   "dependencies": {
+    "dotenv": "^18.0.9",
     "express": "^5.2.1",
+    "mongoose": "^9.11.4",
     "morgan": "^1.12.1"
   }
 }

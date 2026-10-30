@@ -1,24 +1,7 @@
 import express from "express";
 import morgan from "morgan";
+import Note from "./models/note.js";
 const app = express();
-
-let notes = [
-  {
-    id: "1",
-    content: "HTML is easy",
-    important: true,
-  },
-  {
-    id: "2",
-    content: "Browser can execute only JavaScript",
-    important: false,
-  },
-  {
-    id: "3",
-    content: "GET and POST are the most important methods of HTTP protocol",
-    important: true,
-  },
-];
 
 app.use(express.json());
 morgan.token("body", (req, res) => `${JSON.stringify(req.body)}`);
@@ -28,46 +11,70 @@ app.use(
 app.use(express.static("dist"));
 
 app.get("/api/notes", (request, response) => {
-  response.json(notes);
+  Note.find({}).then((notes) => {
+    response.json(notes);
+  });
 });
 
-app.get("/api/notes/:id", (req, res) => {
+app.get("/api/notes/:id", (req, res, next) => {
   const id = req.params.id;
-  const note = notes.find((note) => note.id === id);
-  if (note) {
-    return res.json(note);
-  }
+  Note.findById(id)
+    .then((note) => {
+      if (note) {
+        return res.json(note);
+      }
 
-  return res.status(404).end();
+      return res.status(404).end();
+    })
+    .catch(next);
 });
 
-app.delete("/api/notes/:id", (req, res) => {
+app.delete("/api/notes/:id", (req, res, next) => {
   const id = req.params.id;
-  notes = notes.filter((note) => note.id !== id);
+  Note.findByIdAndDelete(id)
+    .then((note) => {
+      if (note) {
+        return res.status(204).end();
+      }
 
-  return res.status(204).end();
+      return res.status(404).end();
+    })
+    .catch(next);
 });
 
-const genrateId = () => {
-  const maxId =
-    notes.length > 0 ? Math.max(...notes.map((note) => Number(note.id))) : 0;
-  return String(maxId + 1);
-};
-
-app.post("/api/notes", (request, response) => {
+app.post("/api/notes", (request, response, next) => {
   const body = request.body;
 
-  if (!body.content)
-    return response.status(400).json({ error: "missing content" });
-
-  const note = {
+  const note = new Note({
     content: body.content,
     important: body.important || false,
-    id: genrateId(),
-  };
+  });
+  
+  note
+    .save()
+    .then((note) => {
+      response.status(201).json(note);
+    })
+    .catch(next);
+});
 
-  notes = notes.concat(note);
-  return response.json(note);
+app.put("/api/notes/:id", (request, respone, next) => {
+  const { content, important } = request.body;
+
+  Note.findById(request.params.id)
+    .then((note) => {
+      if (!note) {
+        return respone.status(404).end();
+      }
+
+      note.content = content;
+      note.important = important;
+
+      return note.save().then((updatedNote) => {
+        respone.json(updatedNote);
+      });
+    })
+    .catch(next);
 });
 const PORT = process.env.PORT || 3001;
 
@@ -75,8 +82,24 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-const errorHandling = (req, res, next) => {
+const unknownEndpoint = (req, res, next) => {
   return res.status(404).send({ error: "unknown endpoint" });
+};
+
+app.use(unknownEndpoint);
+
+const errorHandling = (err, req, res, next) => {
+  console.error(err.message);
+
+  if (err.name === "CastError") {
+    return res.status(400).send({ message: "malformatted Id" });
+  }
+
+  if (err.name === "ValidationError") {
+    return res.status(400).json({ message: err.message });
+  }
+
+  next(err);
 };
 
 app.use(errorHandling);
