@@ -67,13 +67,20 @@ const App = () => {
       number: number,
     };
 
-    services.create(newContact).then(data => {
-      console.log(data);
-      setPersons(persons.concat(data));
+    services
+      .create(newContact)
+      .then(data => {
+        console.log(data);
+        setPersons(persons.concat(data));
 
-      setMessage(`${data.name} added`);
-      setTimeout(() => setMessage(null), 2000);
-    });
+        setMessage(`${data.name} added`);
+        setTimeout(() => setMessage(null), 2000);
+      })
+      .catch(err => {
+        console.log(err.response.data.message);
+        setErrorMessage(err.response.data.message);
+        setTimeout(() => setErrorMessage(null), 2000);
+      });
 
     setNewName('');
     setNewNumber('');
