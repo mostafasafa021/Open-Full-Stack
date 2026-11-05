@@ -2,8 +2,7 @@ import express from 'express'
 import config from './utils/config.js'
 import mongoose from 'mongoose'
 import middleware from './utils/middleware.js'
-import Blog from './models/blog.js'
-
+import blogsRouter from './controllers/blogs.js'
 const app = express()
 
 mongoose
@@ -18,29 +17,7 @@ mongoose
 app.use(express.json())
 app.use(middleware.requestLogger)
 
-app.get('/api/blogs', (req, res) => {
-  Blog.find({}).then(blogs => {
-    res.json(blogs)
-  })
-})
-
-app.post('/api/blogs', (req, res, next) => {
-  const { title, author, url, likes } = req.body
-
-  const blog = new Blog({
-    title,
-    author,
-    url,
-    likes,
-  })
-
-  blog
-    .save()
-    .then(blog => {
-      res.status(201).json(blog)
-    })
-    .catch(next)
-})
+app.use('/api/blogs', blogsRouter)
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandling)
