@@ -2,28 +2,9 @@ import express from 'express'
 import config from './utils/config.js'
 import mongoose from 'mongoose'
 import middleware from './utils/middleware.js'
+import Blog from './models/blog.js'
 
 const app = express()
-
-const blogSchema = mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  author: String,
-  url: String,
-  likes: Number,
-})
-
-const Blog = mongoose.model('Blog', blogSchema)
-
-blogSchema.set('toJSON', {
-  transform: (_, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString()
-    delete returnedObject._id
-    delete returnedObject.__v
-  },
-})
 
 mongoose
   .connect(config.MONGODB_URI, { family: 4 })
